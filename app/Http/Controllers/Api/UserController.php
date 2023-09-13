@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Str;
 use App\Http\Controllers\Controller;
 use App\Models\Otp;
+use App\Models\TicketPurchaseItem;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -21,8 +22,7 @@ class UserController extends Controller
         return false;
     }
     public function login(Request $request) {
-        // $email = $request->email;
-        $email = "riyan.satria.619@gmail.com";
+        $email = $request->email;
         $u = User::where('email', $email);
         $user = $u->first();
         $otp = null;
@@ -84,7 +84,8 @@ class UserController extends Controller
 
     public function auth(Request $request) {
         $query = User::where('token', $request->token);
-        $user = $query->with(['premium', 'package'])->first();
+        $user = $query->first();
+        $res['user'] = $user;
         
         $res = ['status' => 200];
         if ($user == "") {
@@ -92,5 +93,16 @@ class UserController extends Controller
         }
 
         return response()->json($res);
+    }
+    public function ticket(Request $request) {
+        $user = User::where('token', $request->token)->first();
+        $tickets = TicketPurchaseItem::where('holder_id', $user->id)
+        ->with(['ticket', 'event', 'holder', 'purchase'])
+        ->get();
+
+        return response()->json([
+            'status' => 200,
+            'tickets' => $tickets
+        ]);
     }
 }

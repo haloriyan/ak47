@@ -10,6 +10,17 @@ Route::group(['prefix' => "user"], function () {
     Route::post('auth', "UserController@auth");
     Route::post('profile', "UserController@profile");
     Route::post('otp', "OtpController@auth");
+    Route::post('ticket', "UserController@ticket");
+
+    Route::group(['prefix' => "transaction"], function () {
+        Route::post('checkout', "PurchaseController@checkout");
+        Route::post('/', "PurchaseController@myTransaction");
+        
+        Route::group(['prefix' => "{id}"], function () {
+            Route::post('holder', "PurchaseController@setHolder");
+            Route::post('/', "PurchaseController@transactionDetail");
+        });
+    });
 });
 
 Route::group(['prefix' => "organizer"], function () {
